@@ -1,0 +1,66 @@
+public class GenerateReport {
+
+
+	static ExtentTest test;
+
+	public static void startTest(ExtentReports report, String strTestCaseID, String strTestCaseName, String strTestCaseDesc){
+
+		test = report.createTest(strTestCaseID+"_"+strTestCaseName, strTestCaseDesc);
+		test.assignCategory("Smoke Test");
+	}
+
+	public static void logStatus(String logStatus, String logDescription){
+
+		String strTestCaseID = GV_KwSheet.get("TC_ID")
+		String strTestCaseName = GV_KwSheet.get("TC_NAME")
+		String screenShotName = strTestCaseID+"_"+strTestCaseName;
+		String screenShotPath = getScreenshot(screenShotName);
+
+		if (logStatus.toUpperCase()=="PASS"){
+
+			test.log(Status.PASS,logDescription);
+		}else{
+			test.fail(logDescription, MediaEntityBuilder.createScreenCaptureFromPath(screenShotPath).build());
+		}
+	}
+
+	public static void logInfo(String logInfo, String logInfoDescription){
+
+		if (logInfo.toUpperCase()=="INFO"){
+
+			test.log(Status.INFO,logInfoDescription);
+		}else{
+			test.log(Status.WARNING,logInfoDescription);
+		}
+	}
+
+	public static void endTest(ExtentReports report){
+		report.flush();
+	}
+
+
+	public static getScreenshot(String screenShotName) throws Exception {
+
+		String strdate2 = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss_SSS").format(new Date());
+
+		String strTestCaseID = GV_KwSheet.get("TC_ID")
+		String strTestCaseName = GV_KwSheet.get("TC_NAME")
+		String strParentFolderName = GV_RunTime.get("strReportParentFolder");
+		String strSubFolderName = GV_RunTime.get("strReportSubFolder");
+		String strSubSubFolderName = GV_RunTime.get("ScreenShotSubFolder");
+
+		File SubSubFolderName = new File(GV_RunTime.get("userParentDirPath")+"Reports\\"+strParentFolderName+"\\"+strSubFolderName+"\\"+strSubSubFolderName)
+
+		if (!SubSubFolderName.exists()){
+			SubSubFolderName.mkdir();
+		}
+
+		WebDriver driver = DriverFactory.getWebDriver();
+		TakesScreenshot ts = (TakesScreenshot) driver;
+		File source = ts.getScreenshotAs(OutputType.FILE)
+		String destination = GV_RunTime.get("userParentDirPath")+"Reports\\"+strParentFolderName+"\\"+strSubFolderName+"\\"+strSubSubFolderName+"\\"+screenShotName+"_"+strdate2+".png";
+		File finalDestination = new File(destination);
+		FileUtils.copyFile(source, finalDestination);
+		return destination;
+	}
+}

@@ -1,0 +1,43 @@
+public class ExtentFactory {
+
+	public static final HashMap<String,String> GV_RunTime = new HashMap<String,String>();
+
+	public static ExtentReports getInstance(){
+		ExtentHtmlReporter htmlReporter;
+		ExtentReports extent;
+		String strdate1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		String strdate2 = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss_SSS").format(new Date());
+		String strdate3 = new SimpleDateFormat("yyy-MM-dd_HH_mm_ss").format(new Date());
+		GV_RunTime.put("strDateTimeStampSec", strdate3);
+		String strParentFolderName = strdate1;
+		String strSubFolderName = "Automation Report_"+strdate3;
+		File ParentFolderName = new File(GV_RunTime.get("userParentDirPath")+"Reports\\"+strParentFolderName);
+		File SubFolderName = new File(GV_RunTime.get("userParentDirPath")+"Reports\\"+strParentFolderName+"\\"+strSubFolderName);
+
+		if (!ParentFolderName.exists()){
+			ParentFolderName.mkdir();
+		}
+
+		if (!SubFolderName.exists()){
+			SubFolderName.mkdir();
+		}
+
+		GV_RunTime.put("strReportParentFolder", strParentFolderName);
+		GV_RunTime.put("strReportSubFolder", strSubFolderName);
+		String strReportName = "Extent Report_"+strdate2;
+		File extentReportPath = new File(GV_RunTime.get("userParentDirPath")+"Reports\\"+strParentFolderName+"\\"+strSubFolderName+"\\"+strReportName+".html");
+		htmlReporter = new ExtentHtmlReporter(extentReportPath);
+		htmlReporter.setAppendExisting(true);
+		htmlReporter.loadXMLConfig(GV_RunTime.get("userParentDirPath")+"\\TestScript\\Config\\extent-config.xml");
+		String HostName = InetAddress.getLocalHost().getHostName();
+		String OperatingSystem = System.getProperty("os.name");
+		String UserName = System.getProperty("user.name");
+
+		extent = new ExtentReports();
+		extent.attachReporter(htmlReporter);
+		extent.setSystemInfo("Host Name", HostName);
+		extent.setSystemInfo("User Name", UserName);
+		extent.setSystemInfo("Operating System", OperatingSystem);
+		return extent;
+	}
+}
